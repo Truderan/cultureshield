@@ -1,0 +1,88 @@
+{
+  "summary": "Completed testing of CultureShield AI standards-aligned scoring model. All 13 backend API tests passed (100%). Dashboard scoring now returns maturity_level, maturity_summary, framework_note, aligned_domains, and phishing_program fields correctly. Company-level overall score (37.5) reflects standards-aligned domain weighting plus risk-flag penalties. Survey submission works and dashboard stats reflect submitted data. Report detail UI has all necessary components to render new standards-aligned sections. No regression in login/register/dashboard/authenticated navigation.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Dashboard",
+        "issues": ["Maturity level (Developing) is returned by API but not prominently displayed on dashboard UI - consider adding maturity level badge near the score"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_standards_aligned_scoring.py",
+    "/app/test_reports/pytest/standards_aligned_scoring_results.xml"
+  ],
+  "action_items": [
+    "Consider displaying maturity_level prominently on Dashboard UI (currently only in API response)"
+  ],
+  "critical_code_review_comments": [
+    "Dashboard stats API correctly returns all standards-aligned fields: maturity_level, maturity_summary, framework_note, aligned_domains, phishing_program",
+    "Overall score (37.5) correctly reflects standards-aligned domain weighting with risk-flag penalties applied",
+    "Framework note correctly references ISO/IEC 27001:2022 and NIST CSF as guidance-only mapping",
+    "5-level maturity model implemented: Initial, Developing, Defined, Managed, Adaptive",
+    "4 control domains mapped: govern_awareness, protect_secure_behavior, detect_verify, respond_report",
+    "Each domain includes ISO and NIST references with maturity assessment",
+    "Phishing program posture correctly returns 'not measured' when no simulation data exists",
+    "ReportDetail.jsx has all UI components for rendering standards-aligned sections with proper data-testid attributes",
+    "Report generation correctly billing-gated for free accounts (403 response as expected)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_standards_aligned_scoring.py"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13 tests passed)",
+    "frontend": "100% (all navigation and UI tests passed)"
+  },
+  "test_credentials": {
+    "alignment_test_account": "alignment_bbe272c9@example.com / StrongPass!234"
+  },
+  "seed_data_creation": "Test account has 1 employee with completed survey generating standards-aligned scores",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Standards-aligned scoring model is fully functional. Dashboard stats API returns all new fields (maturity_level, maturity_summary, framework_note, aligned_domains, phishing_program). Overall score of 37.5 with 'High' risk and 'Developing' maturity reflects the standards-aligned calculation with risk penalties. Report generation is billing-gated (expected). ReportDetail.jsx has all UI components ready to render standards-aligned report sections when reports are generated.",
+  "verified_features": {
+    "dashboard_stats_api": {
+      "endpoint": "GET /api/dashboard/stats",
+      "new_fields": {
+        "maturity_level": "Developing (5-level model: Initial/Developing/Defined/Managed/Adaptive)",
+        "maturity_summary": "Core practices exist, but staff behavior and reporting habits still depend on reminders and isolated training moments.",
+        "framework_note": "ISO/IEC 27001:2022 and NIST CSF guidance-only mapping disclaimer",
+        "aligned_domains": {
+          "govern_awareness": {"score": 57.5, "maturity": "Defined", "iso": "ISO/IEC 27001:2022 Annex A 6.3, 6.4", "nist": "NIST CSF Govern / Protect"},
+          "protect_secure_behavior": {"score": 41.2, "maturity": "Developing", "iso": "ISO/IEC 27001:2022 Annex A 6.7, 6.8", "nist": "NIST CSF Protect"},
+          "detect_verify": {"score": 57.6, "maturity": "Defined", "iso": "ISO/IEC 27001:2022 Annex A 6.3", "nist": "NIST CSF Detect / Protect"},
+          "respond_report": {"score": 56.1, "maturity": "Defined", "iso": "ISO/IEC 27001:2022 Annex A 6.8, 5.24", "nist": "NIST CSF Respond"}
+        },
+        "phishing_program": {"measured": false, "summary": "Phishing simulation evidence has not been captured yet"}
+      },
+      "overall_score": 37.5,
+      "risk_level": "High"
+    },
+    "report_detail_ui": {
+      "components_ready": [
+        "framework_notice card (data-testid: report-framework-notice-card)",
+        "maturity_assessment card (data-testid: report-maturity-card)",
+        "control_domain_scores card (data-testid: report-control-domain-card)",
+        "phishing_program_findings card (data-testid: report-phishing-findings-card)",
+        "framework_alignment card (data-testid: report-framework-alignment-card)"
+      ]
+    },
+    "billing_gate": {
+      "report_generation": "Correctly returns 403 for free accounts",
+      "expected_behavior": true
+    }
+  },
+  "regression_tests": {
+    "auth_login": "Working - returns access_token",
+    "auth_me": "Working - returns company info",
+    "employees_list": "Working - returns employee list",
+    "reports_list": "Working - returns empty list (no reports generated)",
+    "dashboard_navigation": "Working - all sidebar links functional"
+  }
+}

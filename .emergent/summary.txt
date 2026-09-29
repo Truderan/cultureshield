@@ -1,0 +1,183 @@
+<analysis>**original_problem_statement:**
+The user wants to build a SaaS web application called “CultureShield AI”. This platform helps businesses audit their employees' cybersecurity awareness and behavior.
+
+PRODUCT REQUIREMENTS:
+- **Core Functionality:**
+    - Company registration and a secure, multi-tenant login system.
+    - A company dashboard displaying a main Cybersecurity Culture Score (0-100), component scores (Awareness, Behavior, Reporting), participation rate, and risk level.
+    - An employee-facing survey with questions about password habits, phishing, device security, etc.
+    - A Culture Score Engine to calculate scores based on survey responses.
+    - An AI-powered audit report generator (using GPT-5.2) that creates a downloadable PDF report with an executive summary, scores, risks, and recommendations.
+    - A risk visualization dashboard with charts for password reuse, phishing awareness, etc.
+    - Admin controls for companies to manage employees and generate reports.
+- **Billing System (Production Grade):**
+    - **Provider:** Paystack only (test and live modes).
+    - **Payments:** Support for both recurring subscriptions (Starter, Business, Pro tiers) and one-time (per-audit) payments.
+    - **Features:** Free trials, coupon codes (percentage/fixed), proration on plan changes, and metered usage for one-off audits.
+    - **Customer Flow:** Secure hosted checkout, customer billing portal (for invoices, card updates, plan changes), and abandoned cart reminders (mocked).
+    - **Database:** New tables for , , , and . Store only provider IDs, not raw card data.
+    - **Webhooks:** Implement and secure webhook endpoints for key Paystack events (e.g., , , ) with signature verification and idempotent processing.
+    - **Feature Gating:** Restrict access to premium features based on active subscription status.
+    - **Admin Dashboard:**
+        - **Company Admin:** View plan, billing date, invoices.
+        - **Platform Owner:** View MRR, ARR, churn, ARPU, and revenue metrics.
+    - **Billing Intelligence:**
+        - Basic churn prediction heuristics (e.g., based on low usage, missed payments).
+        - Automated retention actions (e.g., trigger a workflow for At-Risk customers).
+        - Automated plan upgrade/downgrade recommendations based on usage.
+    - **Notifications (Mocked):** Log transactional emails for payment events, renewals, and dunning to the console.
+
+**User's preferred language**: English
+
+**what currently exists?**
+A functional MVP of the CultureShield AI application. Core features are implemented, including user/company registration, a dashboard with scoring, an employee survey, AI-powered PDF report generation, historical trend analysis, and bulk employee CSV import. The backend is a large FastAPI  file, and the frontend is built with React and Shadcn UI. A PDF generation bug has been fixed, and the application has passed several rounds of testing.
+
+**Last working item**:
+    - Last item agent was working: The agent was beginning the implementation of the comprehensive Paystack billing system. It has already received the integration playbook, updated the  file with the user-provided test key, installed the  library, and created a new module  to contain the core billing logic. The immediate next step was to create the API routes for this module.
+    - Status: IN PROGRESS
+    - Agent Testing Done: N
+    - Which testing method agent to use? both
+    - User Testing Done: N
+
+**All Pending/In progress Issue list**:
+  - Issue 1: Implement the full billing system using Paystack. (Priority: P0)
+
+  Issues Detail:
+  - Issue 1: 
+     - Attempted fixes: N/A. The work has just begun.
+     - Next debug checklist: 
+       1. Create a new file .
+       2. In this new file, create FastAPI router endpoints for all required billing functionalities (e.g., getting plans, creating checkout sessions, handling webhooks, providing a portal link).
+       3. Import and use the functions defined in .
+       4. Mount the new billing router in the main  file.
+       5. Implement the required frontend UI: pricing page, checkout flow, and customer billing portal.
+       6. Implement the feature-gating middleware to protect premium API endpoints.
+       7. Implement the Admin billing dashboard.
+     - Why fix this issue and what will be achieved with the fix? This is a critical feature request from the user to add monetization capabilities to the SaaS application.
+     - Status:  IN PROGRESS
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? both
+     - Blocked on other issue: None
+
+**In progress Task List**:
+  - Task 1: Complete Billing System Implementation
+     - Where to resume: Create a new router file for billing (), define the API endpoints, and mount it in . The core logic has been scaffolded in .
+     - What will be achieved with this? The application will have a complete, production-grade billing system enabling subscriptions and one-time payments as per the user's detailed requirements.
+     - Status:  IN PROGRESS
+     - Should Test frontend/backend/both after fix? both
+     - Blocked on something: None
+
+**Upcoming and Future Tasks**
+    Upcoming Tasks:
+    - **P0: Implement Email Notifications:** The user deferred this, asking to mock them for now. The plan is to integrate SendGrid for transactional emails (survey completion alerts, low participation reminders, etc.).
+    - **P1: Phishing Simulation Integration:** A future feature to add real-world risk testing via simulated phishing campaigns.
+
+    Future Tasks:
+    - **P2: Custom Report Builder:** Allow users to build their own custom audit reports.
+    - **P2: Granular Trend Analysis:** Enhance the analytics page with department-level historical data.
+
+**Completed work in this session**
+- **CultureShield AI MVP:**
+  - Implemented company/user authentication ().
+  - Created the main Dashboard, Employee Management, and Survey pages ().
+  - Built the core scoring engine and AI report generation with PDF download ().
+- **Enhanced Scoring Model:**
+  - Integrated weighted risk calculations and behavioral red flags into the scoring logic ().
+- **Analytics and Bulk Import:**
+  - Added a new  for historical trend analysis.
+  - Implemented a bulk employee CSV import feature (, ).
+- **Bug Fixes:**
+  - Resolved a Unicode encoding error in the PDF generation logic in .
+
+**Earlier issues found/mentioned but not fixed**
+   - **Webpack Deprecation Warnings:** During frontend builds, webpack shows deprecation warnings. The agent correctly identified them as non-blocking, but they should be addressed in the future to maintain code health.
+
+**Known issue recurrence from previous fork**
+  - N/A
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+- **Backend:** FastAPI, Python, MongoDB (), JWT authentication,  for PDF generation.
+- **Frontend:** React, React Router, Axios, Recharts, Tailwind CSS.
+- **Integrations:** Emergent LLM Key for GPT-5.2 (AI reports), Paystack for payments (in progress).
+
+**key DB schema**
+- **companies**: {company_id, name, email, password_hash}
+- **employees**: {employee_id, company_id, name, email, department}
+- **survey_responses**: {response_id, employee_id, responses, scores}
+- **audit_reports**: {report_id, company_id, report_content, generated_at}
+- **culture_score_trends**: {trend_id, company_id, score, period, created_at}
+- **(New for Billing)**
+    - **subscriptions**: {company_id, provider_subscription_id, plan_id, status, current_period_end}
+    - **invoices**: {company_id, provider_invoice_id, amount_paid, status, hosted_url}
+    - **payment_methods**: {company_id, provider_payment_method_id, brand, last4}
+    - **billing_events**: {company_id, event_type, payload, processed_at}
+
+**changes in tech stack**
+- Added  and  to  for the new billing integration.
+
+**All files of reference**
+- : The main backend application file containing the majority of the business logic. It has grown quite large.
+- : A new, empty file intended to house all Paystack integration logic to keep it separate from .
+- : The root React component that defines all application routes.
+- : This directory holds all major page components like , , and the new .
+- : Contains all secrets, including the new .
+- : The project requirements document, updated with completed tasks.
+
+**Areas that need refactoring**:
+- The  file is over 1500 lines long and acts as a monolith. The creation of  is a step in the right direction. To improve maintainability, other functionalities like authentication, surveys, and reports should also be broken out into their own separate routers/modules.
+
+**key api endpoints**
+- 
+- , 
+- , 
+- , 
+- **(To be created for billing)**
+- 
+- 
+- 
+- 
+
+**Critical Info for New Agent**
+- You are implementing a comprehensive billing system using **Paystack only**. The user has provided a test key (), which is already in .
+- **Mock email notifications**: All transactional emails related to billing (and other features) should be logged to the console, not sent via a service like SendGrid. The user explicitly deferred this.
+- **Refactoring **: The main backend file is very large. All new billing routes should be created in a separate file (e.g., ) and mounted into  to avoid making it larger. Do not add the billing API endpoints directly to .
+- **Follow detailed requirements**: The user provided a very specific and detailed list of requirements for the billing system (DB schema, webhook handling, feature gating, admin dashboards, etc.). Adhere to this list closely.
+
+**documents and test reports created in this job**
+- 
+- 
+- 
+- 
+- 
+- 
+
+**Last 10 User Messages and any pending HUMAN messages**
+1. **User (Msg 239):** Sent a very detailed request to build a production-grade billing system with specific requirements for Paystack, subscriptions, webhooks, feature gating, and admin intelligence features.
+2. **Agent (Msg 240):** Asked clarifying questions about providers, pricing, email, currency, and webhooks.
+3. **User (Msg 242):** Responded: Use Paystack only with the provided test key, keep the pricing structure, mock emails, use a fixed exchange rate, and configure webhooks for Paystack alone.
+4. **Agent (Msg 243):** Acknowledged the user's choices and stated it would get the Paystack integration playbook.
+5. **Agent (Msg 244-254):** Proceeded with implementation: got the playbook, viewed existing files, updated  with the Paystack key, installed , and created . The last action was an intent to create the billing routes.
+
+**Project Health Check:**
+- **Broken:** The billing system is a work-in-progress and not functional.
+- **Mocked:** All email notifications are currently mocked by logging to the console.
+
+**3rd Party Integrations**
+- **OpenAI GPT-5.2** — uses Emergent LLM Key (for AI report generation).
+- **Paystack** — requires User API Key (for billing, implementation is in progress).
+
+**Testing status**
+  - Testing agent used after significant changes: YES
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: []
+  - Known regressions: None.
+
+**Credentials to test flow:**
+- For app login/registration, new users can be created via the UI or the  endpoint.
+- For billing, the Paystack test secret key is already configured in : .
+
+**What agent forgot to execute**
+The agent was in the middle of implementation. The next logical step, which has not been executed yet, is to create the FastAPI router for the billing endpoints (e.g., in a new  file) and mount it in the main  application.</analysis>
